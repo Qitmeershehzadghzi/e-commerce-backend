@@ -1,18 +1,18 @@
-import mongoose from 'mongoose'
+import mongoose from "mongoose";
 
 const productSchema = new mongoose.Schema({
-  name: { type: String, required: true },
+  name: { type: String, required: true, trim: true },
   description: { type: String, required: true },
   price: { type: Number, required: true },
-  image: { type: Array, required: true },
+  images: { type: [String], required: true },
   category: { type: String, required: true },
   Subcategory: { type: String, required: true },
-  sizes: { type: Array, required: true },
-  bestseller: { type: Boolean },
-  date: { type: Number, required: true }
-})
+  sizes: { type: [String], required: true },
+  bestseller: { type: Boolean, default: false },
+  date: { type: Number, default: Date.now },
+});
 
-const productModel =
-  mongoose.models.products || mongoose.model('products', productSchema)
+// ✅ Model naming fix → singular, capitalized, without duplicate definitions
+const Product = mongoose.models.Product || mongoose.model("Product", productSchema);
 
-export default productModel
+export default Product;

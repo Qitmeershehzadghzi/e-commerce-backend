@@ -1,12 +1,16 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 const conDb = async () => {
   try {
-    await mongoose.connect(`${process.env.MONGODB_URL}/E-commerce`);
-    console.log('MongoDB is connected');
+    await mongoose.connect(process.env.MONGODB_URL, {
+      dbName: "ecommerce",
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    console.log("✅ MongoDB Connected");
   } catch (error) {
-    console.error('MongoDB connection failed:', error.message);
-    process.exit(1); // process band kar do agar DB connect na ho
+    console.error("❌ MongoDB Connection Error:", error.message);
+    process.exit(1);
   }
 };
 

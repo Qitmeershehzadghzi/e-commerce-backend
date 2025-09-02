@@ -1,18 +1,21 @@
-import express from 'express'
-import { addProduct, removeProduct, listProduct, singleProduct } from '../controller/prodectController.js'
-import upload from '../middleware/multer.js'
+import express from "express";
+import { addProduct, removeProduct, listProduct, singleProduct } from "../controller/productController.js";
+import upload from "../middleware/multer.js";
+import multer from "multer";
+const router = express.Router();
 
-const producterRoute = express.Router()
+// ✅ single field name "images"
 
-// make sure frontend se bhi field name image1, image2, image3, image4 hi bheje
-producterRoute.post(
-  '/add',upload.fields([{name:'image1',maxCount:1},{name:'image2',maxCount:1},{name:'image3',maxCount:1},{name:'image4',maxCount:1}]),
+router.post(
+  "/add",
+  upload.array("  ", 12), // ek hi field "photos" me max 12 images
   addProduct
-)
+);
 
 
-producterRoute.post('/remove', removeProduct)
-producterRoute.post('/single', singleProduct)
-producterRoute.get('/list', listProduct)
 
-export default producterRoute
+router.delete("/remove/:id", removeProduct);
+router.get("/single/:id", singleProduct);
+router.get("/list", listProduct);
+
+export default router;

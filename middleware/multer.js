@@ -1,16 +1,14 @@
 import multer from "multer";
+import path from "path";
 
-// Storage config
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "uploads"); // uploads folder zaroor bana lena
+    cb(null, "uploads/");
   },
   filename: (req, file, cb) => {
-    cb(null, file.originalname); // file ka naam same rahega
+    cb(null, Date.now() + path.extname(file.originalname));
   },
 });
 
-// Upload middleware
 const upload = multer({ storage });
-
 export default upload;
