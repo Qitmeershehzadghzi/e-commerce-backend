@@ -1,38 +1,37 @@
-import { promises } from "dns";
+// import { promises } from "dns";
+import { uploadImageToCloudinary } from "../helpers/upload.js";
 import Product from "../models/productModel.js";
 import { v2 as cloudinary } from "cloudinary";
+// import{name,description}from '../models/productModel.js'
 
 // ➕ Add Product
+// ...existing code...
 export const addProduct = async (req, res) => {
   try {
-    console.log("🖼 Files:", req.files);
+    console.log("🖼 Files:", req.files); // req.files is now an array
     console.log("📦 Body:", req.body);
 
-    const image1 = req.files?.image1?.[0] 
-    const image2 = req.files?.image2?.[0] 
-    const image3 = req.files?.image3?.[0] 
-    const image4 = req.files?.image4?.[0] 
-    const images =[
-      image1,image2,image3,image4
-    ].filter((item)=>item !==undefined)
-let imagesUrl = await promises.all(
-  images.map(async(item)=>{
-let result = await cloudinary.uploader.upload(
-  item.path,{
-    resource_type:'image'
-  }
-)
-return result.secure_url
-  })
-)
-    console.log("📸 Uploaded Files:", image1, image2, image3, image4);
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).json({ success: false, message: "No images uploaded" });
+    }
 
-    res.json({});
+    let imagesUrl = [];
+    for (let img of req.files) {
+      const result = await uploadImageToCloudinary(img);
+      if (result.status) {
+        imagesUrl.push(result.url);
+      }
+    }
+
+    console.log("📸 Uploaded URLs:", imagesUrl);
+
+    res.json({ success: true, imagesUrl });
   } catch (error) {
     console.log("❌ addProduct Error:", error);
     res.json({ success: false, message: error.message });
   }
 };
+// ...existing code...
 
 
 

@@ -1,6 +1,6 @@
 import express from "express";
 import { addProduct, removeProduct, listProduct, singleProduct } from "../controller/productController.js";
-import upload from "../middleware/multer.js";
+import { upload } from "../helpers/upload.js";
 import multer from "multer";
 const router = express.Router();
 
@@ -8,8 +8,22 @@ const router = express.Router();
 
 router.post(
   "/add",
-  upload.array("  ", 12), // ek hi field "photos" me max 12 images
-  addProduct
+  (req, res, next) => {
+    upload(req, res, function(err) {
+      if (err instanceof multer.MulterError) {
+        return res.status(400).json({
+          status: false,
+          message: `Upload error: ${err.message}`
+        });
+      } else if (err) {
+        return res.status(500).json({
+          status: false,
+          message: `Unknown error: ${err.message}`
+        });
+      }
+      addProduct(req, res);
+    });
+  }
 );
 
 
