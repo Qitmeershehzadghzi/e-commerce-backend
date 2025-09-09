@@ -84,8 +84,8 @@ export const adminLogin = async (req, res) => {
       // ✅ Object payload instead of string
       const token = jwt.sign(
         { email, role: "admin" },
-        process.env.JWT_SECRET,
-        { expiresIn: "1h" }
+        process.env.JWT_SECRET
+       
       );
       res.json({ success: true, token });
     } else {
