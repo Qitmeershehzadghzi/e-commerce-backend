@@ -70,13 +70,22 @@ export const placeOrederRazorpay =async (req,res)=>{
 
 
 //  All orders data from admin panel
-export const allOrders =async (req,res)=>{
-    try {
-        
-    } catch (error) {
-        
-    }
-}
+// controller for /order/list
+export const allOrders = async (req, res) => {
+  try {
+    const orders = await orderModel.find({}); // await zaroor likhna
+    res.json({
+      success: true,
+      data: orders,   // yeh plain JSON-safe array hota hai
+    });
+  } catch (error) {
+    res.json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 
 //  user order data from frontend
 export const userOrders =async (req,res)=>{
