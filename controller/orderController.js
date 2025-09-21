@@ -6,10 +6,10 @@ import userModel from "../models/userModel.js"
 // placing order using cod method
  export const placeOreder =async (req,res)=>{
     try {
-        const {userId,itmes,amount,address}=req.body
+        const {userId,items,amount,address}=req.body
         const orderData= {
             userId,
-            itmes,
+            items,
             address,
             amount,
             paymentMethod:"COD",
