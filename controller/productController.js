@@ -17,7 +17,7 @@ export const addProduct = async (req, res) => {
     }
 
     // ✅ req.body se fields nikal lo
-    const { name, description, price, category, Subcategory, bestseller, sizes } = req.body;
+    const { name, description, price, category, Subcategory, bestseller, sizes,images } = req.body;
 
     let imagesUrl = [];
     for (let img of req.files) {
