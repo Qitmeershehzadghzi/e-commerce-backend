@@ -9,6 +9,7 @@ import cartRoute from "./routes/CartRoute.js";
 import orderRouter from "./routes/orderRoute.js";
 
 dotenv.config();
+console.log("ENV MONGODB_URL:", process.env.MONGODB_URL);
 
 const app = express();
 const port = process.env.PORT || 4000;

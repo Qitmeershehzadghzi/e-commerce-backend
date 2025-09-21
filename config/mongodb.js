@@ -3,7 +3,6 @@ import mongoose from "mongoose";
 const conDb = async () => {
   try {
     await mongoose.connect(process.env.MONGODB_URL, {
-      dbName: "ecommerce",
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
