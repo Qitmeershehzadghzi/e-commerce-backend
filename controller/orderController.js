@@ -1,15 +1,20 @@
 import orderModel from "../models/orderModel.js"
 import userModel from "../models/userModel.js"
 import productModel from '../models/productModel.js'
+import Stripe from 'stripe'
 
+ const currency = "PKR";
+  const delivery_fee = 150;
+const stripe=new Stripe(process.env.STRIPE_SECRET_KEY)
 
 // placing order using cod method
- export const placeOreder =async (req,res)=>{
-    try {
+// placing order using cod method
+export const placeOreder = async (req, res) => {
+  try {
     const { userId, items, amount, address } = req.body;
 
     // Har product ka detail nikalna (name, image, price)
-    const enrichedItems = [];
+    const enrichedItems = []
     for (let item of items) {
       const product = await productModel.findById(item.productId);
       enrichedItems.push({
@@ -17,7 +22,7 @@ import productModel from '../models/productModel.js'
         quantity: item.quantity,
         size: item.size,
         name: product?.name || "Unknown Product",
-        images: product?.images?.length ? product.images : [], // Cloudinary ka url ayega
+        images: product?.images?.length ? product.images : [],
         price: product?.price || 0,
       });
     }
@@ -51,21 +56,95 @@ import productModel from '../models/productModel.js'
     res.json({ success: false, message: error.message });
   }
 }
+
 // placing order using Stripe  method
-export const placeOrederStripe =async (req,res)=>{
-    try {
-        
-    } catch (error) {
-        
+export const placeOrederStripe = async (req, res) => {
+  try {
+    const { userId, items, amount, address, origin } = req.body; // ✅ origin from body
+    console.log("Frontend Origin:", origin);
+
+    const enrichedItems = [];
+    for (let item of items) {
+      const product = await productModel.findById(item.productId);
+        console.log("Fetched Product:", product);  // 👈 check here
+
+      enrichedItems.push({
+        productId: item.productId,
+        quantity: item.quantity,
+        size: item.size,
+        name: product?.name || "Unknown Product",
+        images: product?.images?.length ? product.images : [],
+        price: product?.price || 0,
+      });
     }
+
+    const orderData = {
+      userId,
+      items: enrichedItems,
+      address,
+      amount,
+      paymentMethod: "Stripe",
+      payment: false,
+      status: "order placed",
+      date: Date.now(),
+    };
+
+    const newOrder = new orderModel(orderData);
+    await newOrder.save();
+
+    const line_item = enrichedItems.map((item) => ({
+      price_data: {
+        currency: currency,
+        product_data: { name: item.name },
+        unit_amount: item.price * 100,
+      },
+      quantity: item.quantity,
+    }));
+
+    line_item.push({
+      price_data: {
+        currency: currency,
+        product_data: { name: "Delivery charges" },
+        unit_amount: delivery_fee * 100,
+      },
+      quantity: 1,
+    });
+
+    const session = await stripe.checkout.sessions.create({
+      success_url: `${origin}/verify?success=true&orderId=${newOrder._id}`,
+      cancel_url: `${origin}/verify?success=false&orderId=${newOrder._id}`,
+      line_items: line_item,
+      mode: "payment",
+    });
+
+    res.json({ success: true, session_url: session.url }); // ✅ keep session_url
+  } catch (error) {
+    console.error(error);
+    res.json({ success: false, message: error.message });
+  }
+};
+
+const verifyStripe=async (req,res)=>{
+  const{orderId,success,userId}=req.body
+  try {
+    
+  } catch (error) {
+    
+  }
 }
+
+
+
+
+
+
 // placing order using Razorpay method
-export const placeOrederRazorpay =async (req,res)=>{
-    try {
-        
-    } catch (error) {
-        
-    }
+export const placeOrederRazorpay = async (req, res) => {
+  try {
+
+  } catch (error) {
+
+  }
 }
 
 
@@ -85,27 +164,30 @@ export const allOrders = async (req, res) => {
     });
   }
 };
-
-
 //  user order data from frontend
-export const userOrders =async (req,res)=>{
-    try {
-        const {userId} =req.body
-        const orders =await orderModel.find({userId})
-        res.json({success:true,orders})
-    } catch (error) {
-        console.log(error);
-        
-                   res.json({success:true,message:error.message})
-    }
+export const userOrders = async (req, res) => {
+  try {
+    const { userId } = req.body
+    const orders = await orderModel.find({ userId })
+    res.json({ success: true, orders })
+  } catch (error) {
+    console.log(error);
+    res.json({ success: false, message: error.message })
+
+  }
 }
 
 
 // update order status from admin panel
-export const updateStatus =async (req,res)=>{
-    try {
-        
-    } catch (error) {
-        
-    }
+export const updateStatus = async (req, res) => {
+  try {
+    const { orderId, status } = req.body
+    await orderModel.findByIdAndUpdate(orderId, { status })
+    res.json({ success: true, message: 'Status updated' })
+  } catch (error) {
+    console.log(error);
+    res.json({ success: false, message: error.message })
+
+
+  }
 }
