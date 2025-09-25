@@ -5,13 +5,15 @@ import {
   placeOrederStripe, 
   allOrders, 
   userOrders, 
-  updateStatus 
+  updateStatus,
+  verifyStripe 
 } from '../controller/orderController.js';
 
 const orderRouter = express.Router();
 
 import  adminAuth  from '../middleware/AdminAuth.js';
 import { authUser } from '../middleware/auth.js';
+import Stripe from 'stripe';
 
 // admin features
 orderRouter.post('/list', adminAuth, allOrders);
@@ -24,5 +26,10 @@ orderRouter.post('/razorpay', authUser, placeOrederRazorpay);
 
 // user feature
 orderRouter.post('/userOrders', authUser, userOrders);
+
+
+
+// verify Stripe
+orderRouter.post('/verifyStripe', authUser, verifyStripe );
 
 export default orderRouter;
