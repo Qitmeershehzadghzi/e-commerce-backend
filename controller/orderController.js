@@ -122,38 +122,28 @@ export const placeOrederStripe = async (req, res) => {
   }
 }
 
-export const verifyStripe =async(req,res)=>{
-const {orderId,success,userId}=req.body
-try {
-  if (success === 'true') {
-    await orderModel.findByIdAndUpdate(orderId,{payment:true})
-await userModel.findByIdAndUpdate(userId,{cartData:{}})
-res.json({success:true})
+export const verifyStripe = async (req, res) => {
+  const { orderId, success, userId } = req.body;
 
-  }else{
-    await orderModel.findByIdAndDelete(orderId)
-  res.json({success:false})
+  try {
+    if (success === true || success === "true") {
+      await orderModel.findByIdAndUpdate(orderId, { payment: true });
+      await userModel.findByIdAndUpdate(userId, { $set: { cartData: {} } });
+      return res.json({ success: true });
+    } else {
+      await orderModel.findByIdAndDelete(orderId);
+      return res.json({ success: false });
+    }
+  } catch (error) {
+    console.error(error);
+    return res.json({ success: false, message: error.message });
   }
-
-
-
-
-} catch (error) {
-   console.error(error);
-    res.json({ success: false, message: error.message });
-}
-  }
+};
 
 
 
 // placing order using Razorpay method
-export const placeOrederRazorpay = async (req, res) => {
-  try {
 
-  } catch (error) {
-
-  }
-}
 
 
 //  All orders data from admin panel
