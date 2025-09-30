@@ -8,7 +8,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 // ✅ Default currency aur delivery fee define kar do
 const currency = "pkr";
 const delivery_fee = 200;
-
+const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5173";
 // placing order using cod method
 export const placeOreder = async (req, res) => {
   try {
@@ -60,7 +60,9 @@ export const placeOreder = async (req, res) => {
 // placing order using Stripe  method
 export const placeOrederStripe = async (req, res) => {
   try {
-    const { userId, items, amount, address, origin } = req.body; // ✅ origin from body
+    const { userId, items, amount, address } = req.body; // ✅ origin from body
+    const origin = FRONTEND_URL;
+
     console.log("Frontend Origin:", origin);
 
     const enrichedItems = [];
