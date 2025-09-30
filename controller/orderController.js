@@ -108,12 +108,12 @@ export const placeOrederStripe = async (req, res) => {
       quantity: 1,
     });
 
-    const session = await stripe.checkout.sessions.create({
-      success_url: `${origin}/verify?success=true&orderId=${newOrder._id}`,
-      cancel_url: `${origin}/verify?success=false&orderId=${newOrder._id}`,
-      line_items: line_item,
-      mode: "payment",
-    });
+   const session = await stripe.checkout.sessions.create({
+  success_url: `${origin}/orders`,   // Payment success hone ke baad orders page
+  cancel_url: `${origin}/`,          // Payment cancel/fail hone ke baad home page
+  line_items: line_item,
+  mode: "payment",
+});
 
     res.json({ success: true, session_url: session.url }); // ✅ keep session_url
   } catch (error) {
