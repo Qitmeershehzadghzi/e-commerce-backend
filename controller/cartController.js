@@ -1,9 +1,31 @@
 import UserModel from "../models/userModel.js";
 
 // ADD product to user cart
+// Backend - controller/cartController.js
+export const getUserCart = async (req, res) => {
+  try {
+    // ✅ FIX: Use req.userId instead of req.body.userId
+    const userId = req.userId; // This comes from auth middleware
+    const userData = await UserModel.findById(userId);
+
+    if (!userData) {
+      return res.json({ success: false, message: "User not found" });
+    }
+
+    let cartData = userData.cartData || {};
+    res.json({ success: true, cartData });
+  } catch (error) {
+    console.log(error);
+    res.json({ success: false, message: error.message });
+  }
+};
+
+// Also update other cart functions similarly:
 export const addToCart = async (req, res) => {
   try {
-    const { userId, itemId, size } = req.body;
+    const { itemId, size } = req.body; // Remove userId from here
+    const userId = req.userId; // Get from auth middleware
+    
     const userData = await UserModel.findById(userId);
     let cartData = userData.cartData;
 
@@ -26,10 +48,11 @@ export const addToCart = async (req, res) => {
   }
 };
 
-// UPDATE product quantity in cart
 export const updateCart = async (req, res) => {
   try {
-    const { userId, itemId, size, quantity } = req.body;
+    const { itemId, size, quantity } = req.body; // Remove userId from here
+    const userId = req.userId; // Get from auth middleware
+    
     const userData = await UserModel.findById(userId);
     let cartData = userData.cartData;
 
@@ -39,20 +62,6 @@ export const updateCart = async (req, res) => {
 
     await UserModel.findByIdAndUpdate(userId, { cartData });
     res.json({ success: true, message: "Updated cart" });
-  } catch (error) {
-    console.log(error);
-    res.json({ success: false, message: error.message });
-  }
-};
-
-// GET user cart
-export const getUserCart = async (req, res) => {
-  try {
-    const { userId } = req.body;
-    const userData = await UserModel.findById(userId);
-
-    let cartData = userData.cartData || {};
-    res.json({ success: true, cartData }); // ✅ FIX: proper field return
   } catch (error) {
     console.log(error);
     res.json({ success: false, message: error.message });
