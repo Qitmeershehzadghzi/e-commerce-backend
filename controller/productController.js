@@ -9,15 +9,14 @@ import { v2 as cloudinary } from "cloudinary";
 // ...existing code...
 export const addProduct = async (req, res) => {
   try {
-    console.log("🖼 Files:", req.files); // req.files is now an array
+    console.log("🖼 Files:", req.files);
     console.log("📦 Body:", req.body);
 
     if (!req.files || req.files.length === 0) {
       return res.status(400).json({ success: false, message: "No images uploaded" });
     }
 
-    // ✅ req.body se fields nikal lo
-    const { name, description, price, category, Subcategory, bestseller, sizes,images } = req.body;
+    const { name, description, price, category, Subcategory, bestseller, sizes, discount } = req.body;
 
     let imagesUrl = [];
     for (let img of req.files) {
@@ -31,12 +30,13 @@ export const addProduct = async (req, res) => {
       name,
       description,
       price: Number(price),
+      discount: Number(discount) || 0,   // 👈 Add discount here
       category,
       Subcategory,
       bestseller: bestseller === 'true' ? true : false,
-      sizes: JSON.parse(sizes),  // ✅ JSON.parse sahi likha
+      sizes: JSON.parse(sizes),
       images: imagesUrl,
-      date: Date.now()
+      date: Date.now(),
     };
 
     console.log(productDta);
@@ -44,12 +44,13 @@ export const addProduct = async (req, res) => {
     const pd = productModel(productDta);
     await pd.save();
 
-    res.json({ success: true, message: 'product added' });
+    res.json({ success: true, message: "Product added" });
   } catch (error) {
     console.log("❌ addProduct Error:", error);
     res.json({ success: false, message: error.message });
   }
 };
+
 
 // ...existing code...
 // 📃 List Products
